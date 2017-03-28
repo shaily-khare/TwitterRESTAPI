@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+
+    <div ng-app="API" data-ng-controller="API">
+      <div class="col-md-7" ng-show=welcome>
+        <h1><%= title %></h1>
+      </div>
+
+      <div class="col-md-7" ng-show=usertimeline>
+        <!--<h1><%= title %></h1>-->
+        <div ng-repeat="id in result">
+          <table class="table table-striped">
+            <tr>
+              <td>
+                {{id.text}}
+              </td>
+            </tr>
+          </table>
+
+        </div>
+      </div>
+
+      <div class="col-md-7" ng-show=hometimeline>
+        <!--<h1><%= title %></h1>-->
+        <div ng-repeat="id in result">
+          <table class="table table-striped">
+            <tr>
+              <td>
+                {{id.text}}
+              </td>
+            </tr>
+          </table>
+
+        </div>
+      </div>
+
+      <div class="col-md-7" ng-show=friendship>
+        <h1><%= title %></h1>
+        <div>
+          <div>
+              <p>{{friendres}}</p>
+          </div>
+          <div ng-show='$scope.result["following"] == false'>
+            <p>succesfully not followed</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-7" ng-show=search>
+        <!--<h1><%= title %></h1>-->
+        <div ng-repeat="id in result">
+          <table class="table table-striped">
+            <tr>
+              <td>
+                {{id.text}}
+              </td>
+            </tr>
+          </table>
+
+        </div>
+      </div>
+
+
+      <div class="col-md-7" ng-show=updatestatus>
+        <div>
+          <p>{{updateres}} </p>
+        </div>
+      </div>
+
+      <div class="col-md-7" ng-show=followers>
+        <!--<h1><%= title %></h1>-->
+        <div ng-repeat="id in result">
+          <table class="table table-striped">
+            <tr>
+              <td>
+                {{id}}
+              </td>
+            </tr>
+          </table>
+
+        </div>
+      </div>
+
+      <div class="col-md-7" ng-show=followerslist>
+        <!--<h1><%= title %></h1>-->
+        <div ng-repeat="id in result">
+          <table class="table table-striped">
+            <tr>
+              <td>
+                {{id.screen_name}}
+              </td>
+            </tr>
+          </table>
+
+        </div>
+      </div>
+
+      <div class="col-md-7" ng-show=friendslist>
+        <!--<h1><%= title %></h1>-->
+        <div ng-repeat="id in result">
+          <table class="table table-striped">
+            <tr>
+              <td>
+                {{id.text}}
+              </td>
+            </tr>
+          </table>
+
+        </div>
+      </div>
+
+      <div class="col-md-7" ng-show=searchuser>
+        <!--<h1><%= title %></h1>-->
+        <div ng-repeat="id in result">
+          <table class="table table-striped">
+            <tr>
+              <td>
+                {{id.screen_name}}
+              </td>
+            </tr>
+          </table>
+
+
+
+
+
+        </div>
+      </div>
+
+      <div class="col-md-7" ng-show=trendplace>
+        <!--<h1><%= title %></h1>-->
+        <div ng-repeat="id in result">
+          <table class="table table-striped">
+            <tr>
+              <td>
+                {{id.name}}
+              </td>
+            </tr>
+          </table>
+
+        </div>
+      </div>
+
+      <div class="col-md-5">
+      <form name="usertimeline" enctype="multipart/form-data" novalidate>
+        <input type="text" name="user_timeline" ng-model="user_timeline" required>
+        <input type="submit" value="submit" ng-click="gettimeline()" class="btn btn-success">
+        <select name="oper" ng-model="oper">
+          <option value="get statuses">User Timeline</option>
+          <option value="get home timeline">Home Timeline</option>
+          <option value="get friendship">Friendship</option>
+          <option value="search">Search</option>
+          <option value="update status">Update Status</option>
+          <option value="followers">Followers</option>
+          <option value="followers list">Followers List</option>
+          <option value="friends list">Friends List</option>
+          <option value="search user">Search User</option>
+          <option value="trend place">Place</option>
+        </select>
+      </form>
+
+    </div>
+
+    </div>
+  </body>
+ <script>
+
+   var app = angular.module('API', []);
+   app.controller('API',['$scope','$http',function ($scope,$http)
+   {
+     $scope.usertimeline = false;
+     $scope.hometimeline = false;
+     $scope.friendship = false;
+     $scope.search = false;
+     $scope.updatestatus = false;
+     $scope.followers = false;
+     $scope.followerslist = false;
+     $scope.friendslist = false;
+     $scope.searchuser = false;
+     $scope.trendplace = false;
+     $scope.welcome = true;
+     $scope.gettimeline = function()
+
+     {
+
+       alert($scope.user_timeline);
+
+       switch ($scope.oper)
+       {
+         case "get statuses": alert("get statuses");
+         {
+           $http
+           ({
+             method: 'POST',
+             url: '/status',
+//           params:{"id1":$scope.user_timeline}
+             data:{"id1":$scope.user_timeline}
+           }).
+           then(function(response)
+             {
+
+               $scope.welcome = true;
+               $scope.usertimeline = true;
+
+             alert(response.data.status);
+             if (response.data.status == 200)
+               {
+               $scope.result=angular.fromJson(response.data.tweets1);
+//               alert($scope.result[0]["statuses"][0]["text"]);
+//                  for (var i=0 , i < response.data.l; i++)
+//                   {
+//                     $scope.id=att[i]["p-id"];
+//                   }
+             }})
+
+         }break;
+
+         case "get home timeline": alert("get home timeline");
+         {
+
+             $http({
+               method: 'POST',
+               url: '/hometimeline',
+               data:{"id2":$scope.user_timeline}
+             }).
+             then(function(response)
+             {
+               $scope.usertimeline = false;
+               $scope.hometimeline = true;
+               $scope.friendship = false;
+               $scope.search = false;
+               $scope.updatestatus = false;
+               $scope.followers = false;
+               $scope.followerslist = false;
+               $scope.friendslist = false;
+               $scope.searchuser = false;
+               $scope.trendplace = false;
+               $scope.welcome = true;
+
+               alert(response.data.status);
+               if (response.data.status == 200)
+               {
+                 $scope.result=angular.fromJson(response.data.tweets1);
+                 alert($scope.result[0]["name"]);
+               }})
+         }break;
+         case "get friendship": alert("get friendship case");
+           {
+
+               $http({
+                 method: 'POST',
+                 url: '/friendship',
+                 data:{"id3":$scope.user_timeline}
+               }).
+               then(function(response)
+               {
+                 $scope.usertimeline = false;
+                 $scope.hometimeline = false;
+                 $scope.friendship = true;
+                 $scope.search = false;
+                 $scope.updatestatus = false;
+                 $scope.followers = false;
+                 $scope.followerslist = false;
+                 $scope.friendslist = false;
+                 $scope.searchuser = false;
+                 $scope.trendplace = false;
+                 $scope.welcome = false;
+
+                 alert(response.data.status);
+                 if (response.data.status == 200)
+                 {
+                   alert("gagan");
+
+                   $scope.result=angular.fromJson(response.data.tweets1);
+                   alert(angular.fromJson(response.data.tweets1));
+//                   var result1 = result;
+                   alert($scope.result);
+                   alert("deol"+$scope.result["following"]);
+                   if ($scope.result["following"])
+                   {$scope.friendres = "Succesfully Followed"}
+                   else
+                   {$scope.friendres = "Not Followed"
+                   }
+               }})
+           }break;
+
+         case "search": alert("search");
+             {
+                 $http({
+                   method: 'GET',
+                   url: '/search',
+                   params:{"id4":$scope.user_timeline}
+//                   data:{"id4":$scope.user_timeline}
+                 }).
+                 then(function(response)
+                 {
+                   $scope.usertimeline = false;
+                   $scope.hometimeline = false;
+                   $scope.friendship = false;
+                   $scope.search = true;
+                   $scope.updatestatus = false;
+                   $scope.followers = false;
+                   $scope.followerslist = false;
+                   $scope.friendslist = false;
+                   $scope.searchuser = false;
+                   $scope.trendplace = false;
+                   $scope.welcome = true;
+
+                   alert(response.data.status);
+                   if (response.data.status == 200)
+                   {
+                     $scope.result=angular.fromJson(response.data.tweets1["statuses"]);
+                     alert($scope.result["statuses"][0]["text"]);
+//                     alert($scope.result);
+//                     alert($scope.result[0]["text"]);
+                   }
+                 }
+                   )
+             }break;
+         case "update status": alert("update status");
+               {
+                   $http({
+                     method: 'POST',
+                     url: '/updatestatus',
+                     data:{"id5":$scope.user_timeline}
+
+                   }).
+                   then(function(response)
+                   {
+                     $scope.usertimeline = false;
+                     $scope.hometimeline = false;
+                     $scope.friendship = false;
+                     $scope.search = false;
+                     $scope.updatestatus = true;
+                     $scope.followers = false;
+                     $scope.followerslist = false;
+                     $scope.friendslist = false;
+                     $scope.searchuser = false;
+                     $scope.trendplace = false;
+                     $scope.welcome = true;
+
+                     alert(response.data.status);
+                     if (response.data.status == 200)
+                     {
+                       $scope.result=angular.fromJson(response.data.tweets1);
+                       $scope.updateres = "Succesfully updated";
+//
+                     }
+                     if (response.data.status == 250)
+                     {
+                       $scope.result=angular.fromJson(response.data.tweets1);
+                       $scope.updateres = "Not Succesfully updated";
+//
+                     }
+                   })
+               }break;
+
+         case "followers": alert("followers");
+                 {
+                     //alert("test1");
+                     $http({
+                       method: 'GET',
+                       url: '/followers',
+                       params:{"id6":$scope.user_timeline}
+//                       data:{"id6":$scope.user_timeline}
+                     }).
+                     then(function(response)
+                     {
+                       $scope.usertimeline = false;
+                       $scope.hometimeline = false;
+                       $scope.friendship = false;
+                       $scope.search = false;
+                       $scope.updatestatus = false;
+                       $scope.followers = true;
+                       $scope.followerslist = false;
+                       $scope.friendslist = false;
+                       $scope.searchuser = false;
+                       $scope.trendplace = false;
+                       $scope.welcome = true;
+
+
+                       if (response.data.status == 200)
+                       {
+                         $scope.result=angular.fromJson(response.data.tweets1["ids"]);
+//                         alert($scope.result["ids"][0]);
+                         //alert($scope.result[0]["users"]);
+                       }
+                     })
+                 }break;
+         case "followers list": alert("followers list");
+                   {
+                    //alert("test1");
+                       $http({
+                         method: 'GET',
+                         url: '/followerslist',
+                         params:{"id7":$scope.user_timeline}
+//                         data:{"id7":$scope.user_timeline}
+                       }).
+                       then(function(response)
+                       {
+
+                         $scope.usertimeline = false;
+                         $scope.hometimeline = false;
+                         $scope.friendship = false;
+                         $scope.search = false;
+                         $scope.updatestatus = false;
+                         $scope.followers = false;
+                         $scope.followerslist = true;
+                         $scope.friendslist = false;
+                         $scope.searchuser = false;
+                         $scope.trendplace = false;
+                         $scope.welcome = true;
+
+                         //alert(response.data.status);
+                         if (response.data.status == 200)
+                         {
+                           $scope.result=angular.fromJson(response.data.tweets1["users"]);
+                           //alert($scope.result[0]);
+                         }
+                       })
+                   }break;
+         case "friends list": alert("friends list");
+                     {
+                         alert("get the friends list");
+                         $http({
+                           method: 'GET',
+                           url: '/friendslist',
+                           params:{"id8":$scope.user_timeline}
+//                           data: {"id8":$scope.user_timeline}
+                         }).
+                         then(function (response)
+                         {
+                           $scope.usertimeline = false;
+                           $scope.hometimeline = false;
+                           $scope.friendship = false;
+                           $scope.search = false;
+                           $scope.updatestatus = false;
+                           $scope.followers = false;
+                           $scope.followerslist = false;
+                           $scope.friendslist = true;
+                           $scope.searchuser = false;
+                           $scope.trendplace = false;
+                           $scope.welcome = true;
+
+                           alert(response.data.status);
+
+                          if (response.data.status == 200) {
+                            $scope.result = angular.fromJson(response.data.tweets1["users"]);
+//                            $scope.result=angular.fromJson(response.data.tweets1["statuses"]);
+//                            alert($scope.result[0]["name"]);
+                           }
+                        })
+                     }break;
+
+         case "search user": alert("search user");
+                       {
+                           //alert("test1");
+                           $http({
+                             method: 'GET',
+                             url: '/searchuser',
+                             params:{"id9":$scope.user_timeline}
+//                             data: {"id9":$scope.user_timeline}
+                           }).
+                           then(function (response)
+                           {
+                             $scope.usertimeline = false;
+                             $scope.hometimeline = false;
+                             $scope.friendship = false;
+                             $scope.search = false;
+                             $scope.updatestatus = false;
+                             $scope.followers = false;
+                             $scope.followerslist = false;
+                             $scope.friendslist = false;
+                             $scope.searchuser = true;
+                             $scope.trendplace = false;
+                             $scope.welcome = true;
+
+                             //alert(response.data.status);
+                             if (response.data.status == 200) {
+                               $scope.result = angular.fromJson(response.data.tweets1);
+                               // alert($scope.result[0]["name"]);
+                             }
+                           })
+                         }break;
+         case "trend place":alert("trend place");
+                         {
+                           //alert("test1");
+                             $http({
+                               method: 'GET',
+                               url: '/place',
+                               params:{"id10":$scope.user_timeline}
+//                               data: {"id10":$scope.user_timeline}
+                             }).
+                             then(function (response)
+                             {
+
+                               $scope.usertimeline = false;
+                               $scope.hometimeline = false;
+                               $scope.friendship = false;
+                               $scope.search = false;
+                               $scope.updatestatus = false;
+                               $scope.followers = false;
+                               $scope.followerslist = false;
+                               $scope.friendslist = false;
+                               $scope.searchuser = false;
+                               $scope.trendplace = true;
+                               $scope.welcome = true;
+
+                               alert(response.data.status);
+                               //alert(response.data.status);
+                               if (response.data.status == 200)
+                               {
+
+                                 $scope.result = angular.fromJson(response.data.tweets1[0]["trends"]);
+//                                 alert($scope.result["trends"]["name"]);
+                                 //alert($scope.result[0]["name"]);
+                               }
+                             })
+
+                         }
+                       }
+
+   }}]);
+</script>
+</html>
